@@ -1,10 +1,10 @@
+import { useState } from 'react';
 import TarjetaProducto from './TarjetaProducto';
 
-function GaleriaProductos({ productos }) {
+function GaleriaProductos({ productos, titulo }) {
   const [listaProductos, setListaProductos] = useState(productos);
   const [ordenAscendente, setOrdenAscendente] = useState(true);
 
-  // Función para ordenar por precio 
   const ordenarPorPrecio = () => {
     const ordenados = [...listaProductos].sort((a, b) => {
       return ordenAscendente ? a.precio - b.precio : b.precio - a.precio;
@@ -14,10 +14,11 @@ function GaleriaProductos({ productos }) {
   };
 
   return (
-    <div className="seccion-header-galeria">
+    <div>
       <div className="seccion-header">
-        <button className="btn-ordenar" id="btn-ordenar" onClick={ordenarPorPrecio}>
-          <span id="icono-orden">{ordenAscendente ? '↑' : '↓'}</span> Ordenar por precio
+        {titulo && <h2>{titulo}</h2>}
+        <button className="btn-ordenar" onClick={ordenarPorPrecio}>
+          <span>{ordenAscendente ? '↑' : '↓'}</span> Ordenar por precio
         </button>
       </div>
 
