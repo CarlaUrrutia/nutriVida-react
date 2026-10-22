@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import { useAuth } from '../context/AuthContext';
 
 function Registro() {
   const [nombre, setNombre] = useState('');
@@ -10,6 +13,8 @@ function Registro() {
   const [pass2, setPass2] = useState('');
   const [fenac, setFenac] = useState('');
   const [objetivo, setObjetivo] = useState('');
+  const { registrarUsuario } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -79,131 +84,139 @@ function Registro() {
       return;
     }
 
+    const resultado = registrarUsuario({
+      nombre,
+      apellido,
+      rut,
+      email,
+      password: pass,
+      fechaNacimiento: fenac,
+      objetivo
+    });
+
+    if (!resultado.exito) {
+      alert(resultado.mensaje);
+      return;
+    }
+
     alert('Registro exitoso!');
-    setNombre('');
-    setApellido('');
-    setRut('');
-    setEmail('');
-    setPass('');
-    setPass2('');
-    setFenac('');
-    setObjetivo('');
+    navigate('/perfil');
   };
 
   return (
     <main id="contenido">
       <div className="formulario-contenedor">
-        <form name="registro" id="contacto" onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <fieldset>
             <legend>Registro de Paciente</legend>
 
-            <label htmlFor="nombre">Nombre: </label>
-            <input
-              type="text"
-              id="nombre"
-              className="caja"
-              placeholder="Ingrese su nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="nombre">
+              <Form.Label>Nombre: </Form.Label>
+              <Form.Control
+                type="text"
+                className="caja"
+                placeholder="Ingrese su nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="apellido">Apellido: </label>
-            <input
-              type="text"
-              id="apellido"
-              className="caja"
-              placeholder="Ingrese su apellido"
-              value={apellido}
-              onChange={(e) => setApellido(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="apellido">
+              <Form.Label>Apellido: </Form.Label>
+              <Form.Control
+                type="text"
+                className="caja"
+                placeholder="Ingrese su apellido"
+                value={apellido}
+                onChange={(e) => setApellido(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="rut">
-              RUT: <span className="ayuda">(Sin puntos y con guion. Ej: 12345678-9)</span>
-            </label>
-            <input
-              type="text"
-              id="rut"
-              className="caja"
-              placeholder="Ingrese su RUT"
-              value={rut}
-              onChange={(e) => setRut(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="rut">
+              <Form.Label>
+                RUT: <span className="ayuda">(Sin puntos y con guion. Ej: 12345678-9)</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                className="caja"
+                placeholder="Ingrese su RUT"
+                value={rut}
+                onChange={(e) => setRut(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="email">
-              Correo electrónico: <span className="ayuda">(Solo @gmail.com, @outlook.com o @duocuc.cl)</span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="caja"
-              placeholder="ejemplo@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>
+                Correo electrónico: <span className="ayuda">(Solo @gmail.com, @outlook.com o @duocuc.cl)</span>
+              </Form.Label>
+              <Form.Control
+                type="email"
+                className="caja"
+                placeholder="ejemplo@correo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="pass">
-              Contraseña: <span className="ayuda">(Mínimo 6 caracteres)</span>
-            </label>
-            <input
-              type="password"
-              id="pass"
-              className="caja"
-              placeholder="Cree una contraseña"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="pass">
+              <Form.Label>
+                Contraseña: <span className="ayuda">(Mínimo 6 caracteres)</span>
+              </Form.Label>
+              <Form.Control
+                type="password"
+                className="caja"
+                placeholder="Cree una contraseña"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="pass2">Confirmar Contraseña: </label>
-            <input
-              type="password"
-              id="pass2"
-              className="caja"
-              placeholder="Repita su contraseña"
-              value={pass2}
-              onChange={(e) => setPass2(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="pass2">
+              <Form.Label>Confirmar Contraseña: </Form.Label>
+              <Form.Control
+                type="password"
+                className="caja"
+                placeholder="Repita su contraseña"
+                value={pass2}
+                onChange={(e) => setPass2(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="fenac">Fecha de nacimiento: </label>
-            <input
-              type="date"
-              id="fenac"
-              className="caja"
-              value={fenac}
-              onChange={(e) => setFenac(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="fenac">
+              <Form.Label>Fecha de nacimiento: </Form.Label>
+              <Form.Control
+                type="date"
+                className="caja"
+                value={fenac}
+                onChange={(e) => setFenac(e.target.value)}
+              />
+            </Form.Group>
 
-            <label htmlFor="objetivo">Objetivo Nutricional: </label>
-            <select
-              id="objetivo"
-              className="caja"
-              value={objetivo}
-              onChange={(e) => setObjetivo(e.target.value)}
-              required
-            >
-              <option value="">-- Seleccione su objetivo --</option>
-              <option value="peso">Pérdida de peso</option>
-              <option value="metabolico">Control metabólico</option>
-              <option value="deportivo">Nutrición deportiva</option>
-              <option value="vegano">Alimentación vegetariana / vegana</option>
-            </select>
+            <Form.Group className="mb-3" controlId="objetivo">
+              <Form.Label>Objetivo Nutricional: </Form.Label>
+              <Form.Select
+                className="caja"
+                value={objetivo}
+                onChange={(e) => setObjetivo(e.target.value)}
+              >
+                <option value="">-- Seleccione su objetivo --</option>
+                <option value="peso">Pérdida de peso</option>
+                <option value="metabolico">Control metabólico</option>
+                <option value="deportivo">Nutrición deportiva</option>
+                <option value="vegano">Alimentación vegetariana / vegana</option>
+              </Form.Select>
+            </Form.Group>
 
-            <button type="submit" className="btn-principal" style={{ marginTop: '20px' }}>
+            <Button type="submit" className="btn-principal" style={{ marginTop: '10px' }}>
               Registrarse
-            </button>
+            </Button>
 
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
               <p><Link to="/">Volver al inicio</Link></p>
             </div>
           </fieldset>
-        </form>
+        </Form>
       </div>
     </main>
   );

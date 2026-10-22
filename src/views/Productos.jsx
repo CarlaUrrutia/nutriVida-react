@@ -1,10 +1,12 @@
 import GaleriaProductos from '../components/GaleriaProductos';
-import { productosData } from '../data/productos';
+import { useProductos } from '../context/ProductosContext';
 
 function Productos() {
+  const { productos } = useProductos();
+
   return (
     <main id="contenido">
-      <GaleriaProductos productos={productosData} titulo="Planes Nutricionales" />
+      <GaleriaProductos productos={productos} titulo="Planes Nutricionales" />
     </main>
   );
 }

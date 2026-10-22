@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TarjetaProducto from './TarjetaProducto';
 
 function GaleriaProductos({ productos, titulo }) {
   const [listaProductos, setListaProductos] = useState(productos);
   const [ordenAscendente, setOrdenAscendente] = useState(true);
+
+  useEffect(() => {
+    setListaProductos(productos);
+  }, [productos]);
 
   const ordenarPorPrecio = () => {
     const ordenados = [...listaProductos].sort((a, b) => {
@@ -26,11 +30,11 @@ function GaleriaProductos({ productos, titulo }) {
         {listaProductos.map((producto) => (
           <TarjetaProducto
             key={producto.id}
+            id={producto.id}
             imagen={producto.imagen}
             nombre={producto.nombre}
             descripcion={producto.descripcion}
             precio={producto.precio}
-            link={producto.link}
           />
         ))}
       </div>

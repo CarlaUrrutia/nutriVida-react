@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
+  const { iniciarSesion } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -18,58 +23,61 @@ function Login() {
       return;
     }
 
-    if (email !== 'admin@duocuc.cl' || pass !== 'Admin123') {
-      alert('Credenciales incorrectas');
+    const resultado = iniciarSesion(email, pass);
+
+    if (!resultado.exito) {
+      alert(resultado.mensaje);
       setPass('');
       return;
     }
 
     alert('Inicio de sesión exitoso!');
-    setEmail('');
-    setPass('');
+    navigate(resultado.esAdmin ? '/admin' : '/perfil');
   };
 
   return (
     <main id="contenido">
       <div className="formulario-contenedor">
-        <form name="login" id="contacto" onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <fieldset>
             <legend>Iniciar Sesión</legend>
 
-            <label htmlFor="email">
-              Correo electrónico: <span className="ayuda">(Solo @gmail.com, @outlook.com o @duocuc.cl)</span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="caja"
-              placeholder="ejemplo@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>
+                Correo electrónico: <span className="ayuda">(Solo @gmail.com, @outlook.com o @duocuc.cl)</span>
+              </Form.Label>
+              <Form.Control
+                type="email"
+                className="caja"
+                placeholder="ejemplo@correo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-            <label htmlFor="pass">Contraseña: </label>
-            <input
-              type="password"
-              id="pass"
-              className="caja"
-              placeholder="Ingrese su contraseña"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              required
-            />
+            <Form.Group className="mb-3" controlId="pass">
+              <Form.Label>Contraseña: </Form.Label>
+              <Form.Control
+                type="password"
+                className="caja"
+                placeholder="Ingrese su contraseña"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-            <button type="submit" className="btn-principal" style={{ marginTop: '20px' }}>
+            <Button type="submit" className="btn-principal" style={{ marginTop: '10px' }}>
               Ingresar
-            </button>
+            </Button>
 
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <p>¿No tienes una cuenta? <Link to="/registro">Regístrate aquí</Link></p>
               <p><Link to="/">Volver al inicio</Link></p>
             </div>
           </fieldset>
-        </form>
+        </Form>
       </div>
     </main>
   );

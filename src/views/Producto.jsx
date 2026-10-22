@@ -1,45 +1,65 @@
+import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import imgDetalle from '../assets/img/pliegues_cutaneos.jpg';
+import { useProductos } from '../context/ProductosContext';
+import { useCarrito } from '../context/CarritoContext';
+import { useFavoritos } from '../context/FavoritosContext';
 
 function Producto() {
+  const { id } = useParams();
+  const { productos } = useProductos();
+  const producto = productos.find((p) => p.id === Number(id));
+  const { agregarAlCarrito } = useCarrito();
+  const { esFavorito, toggleFavorito } = useFavoritos();
+
   const [agendado, setAgendado] = useState(false);
 
   const handleAgendar = () => {
-    if (!agendado) {
-      alert('Agendamiento exitoso!');
-      setAgendado(true);
-    } else {
-      alert('Ya tienes una hora agendada para este plan');
-    }
+    agregarAlCarrito(producto);
+    setAgendado(true);
   };
+
+  if (!producto) {
+    return (
+      <main id="contenido">
+        <p>No encontramos ese plan.</p>
+        <Link to="/productos" className="btn-secundario">← Volver al catálogo</Link>
+      </main>
+    );
+  }
 
   return (
     <main id="contenido">
       <section className="detalle-producto">
         <div className="detalle-imagen">
-          <img src={imgDetalle} alt="Detalle Pérdida de Peso" />
+          <img src={producto.imagen} alt={producto.nombre} />
+          <button
+            type="button"
+            className={`btn-favorito ${esFavorito(producto.id) ? 'activo' : ''}`}
+            onClick={() => toggleFavorito(producto.id)}
+            aria-label={esFavorito(producto.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+          >
+            {esFavorito(producto.id) ? '♥' : '♡'}
+          </button>
         </div>
 
         <div className="detalle-info">
-          <h2>Plan de Pérdida de Peso</h2>
-          <p className="detalle-descripcion">
-            Evaluación nutricional completa, entrega de pauta alimentaria personalizada y medición de pliegues cutáneos.
-          </p>
+          <h2>{producto.nombre}</h2>
+          <p className="detalle-descripcion">{producto.descripcion}</p>
 
           <div className="detalle-meta">
-            <span>⏱ Duración: 45 minutos</span>
+            <span>⏱ Duración: {producto.duracion}</span>
           </div>
 
-          <p className="precio">$25.000</p>
+          <p className="precio">${producto.precio.toLocaleString('es-CL')}</p>
 
           <div className="detalle-acciones">
             <button
               className="btn-principal"
               onClick={handleAgendar}
+              disabled={agendado}
               style={agendado ? { backgroundColor: 'green' } : {}}
             >
-              {agendado ? '✔ Agendado' : 'Agendar Hora'}
+              {agendado ? '✔ Agendado y en el carrito' : 'Agendar Hora y Agregar al Carrito'}
             </button>
 
             <Link to="/productos" className="btn-secundario">← Volver al catálogo</Link>

@@ -12,41 +12,46 @@ export const productosData = [
     descripcion: 'Evaluación nutricional completa con pauta alimentaria personalizada y medición de pliegues cutáneos para alcanzar tu peso ideal de forma saludable.',
     precio: 25000,
     imagen: imgGordito,
-    link: '/producto'
+    duracion: '45 minutos'
   },
   {
     id: 2,
     nombre: 'Control Metabólico',
     descripcion: 'Plan orientado al manejo de enfermedades metabólicas como diabetes, hipertensión o colesterol alto, con seguimiento continuo y ajustes periódicos.',
     precio: 30000,
-    imagen: imgManejo
+    imagen: imgManejo,
+    duracion: '45 minutos'
   },
   {
     id: 3,
     nombre: 'Nutrición Deportiva',
     descripcion: 'Diseñado para deportistas que buscan mejorar su rendimiento, optimizar la recuperación muscular y alcanzar su composición corporal ideal.',
     precio: 28000,
-    imagen: imgDeportiva
+    imagen: imgDeportiva,
+    duracion: '45 minutos'
   },
   {
     id: 4,
     nombre: 'Nutrición Gestacional',
     descripcion: 'Acompañamiento nutricional durante el embarazo y lactancia para asegurar el bienestar de la madre y el desarrollo óptimo del bebé.',
     precio: 40000,
-    imagen: imgEmbarazadas
+    imagen: imgEmbarazadas,
+    duracion: '45 minutos'
   },
   {
     id: 5,
     nombre: 'Plan Adulto Mayor',
     descripcion: 'Alimentación adaptada a las necesidades del adulto mayor, favoreciendo la masa muscular, la salud ósea y la calidad de vida en esta etapa.',
     precio: 35000,
-    imagen: imgAdultoMayor
+    imagen: imgAdultoMayor,
+    duracion: '45 minutos'
   },
   {
     id: 6,
     nombre: 'Trastornos de la Conducta Alimentaria',
     descripcion: 'Abordaje especializado y empático para personas con anorexia, bulimia u otros TCA, trabajando en conjunto con un equipo multidisciplinario.',
     precio: 35000,
-    imagen: imgTCA
+    imagen: imgTCA,
+    duracion: '45 minutos'
   }
 ];
