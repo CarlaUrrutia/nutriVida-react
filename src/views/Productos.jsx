@@ -2,7 +2,15 @@ import GaleriaProductos from '../components/GaleriaProductos';
 import { useProductos } from '../context/ProductosContext';
 
 function Productos() {
-  const { productos } = useProductos();
+  const { productos, cargando } = useProductos();
+
+  if (cargando) {
+    return (
+      <main id="contenido">
+        <p>Cargando planes...</p>
+      </main>
+    );
+  }
 
   return (
     <main id="contenido">

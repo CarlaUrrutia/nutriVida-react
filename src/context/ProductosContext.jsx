@@ -5,8 +5,14 @@ import ServicioService from '../services/ServicioService';
 
 const ProductosContext = createContext();
 
+// Normaliza un string quitando acentos y pasando a minúsculas para comparar
+const normalizar = (str) =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
 const aProducto = (servicio) => {
-  const conocido = productosData.find((p) => p.nombre === servicio.nombre);
+  const conocido = productosData.find(
+    (p) => normalizar(p.nombre) === normalizar(servicio.nombre)
+  );
   return {
     id: servicio.id_servicio,
     nombre: servicio.nombre,

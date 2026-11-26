@@ -1,16 +1,89 @@
-# React + Vite
+# NutriVida — Frontend (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Interfaz web de la plataforma de nutrición NutriVida. Desarrollada con React 19, Vite, React Router y Axios.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Requisitos previos
 
-## React Compiler
+| Herramienta | Versión mínima |
+|-------------|---------------|
+| Node.js     | 18            |
+| npm         | 9             |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Además, el **backend debe estar corriendo** en `http://localhost:8080` (ver README del proyecto `bd`).
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Ejecutar el frontend
+
+```bash
+# 1. Instalar dependencias (solo la primera vez)
+npm install
+
+# 2. Levantar el servidor de desarrollo
+npm run dev
+```
+
+La aplicación queda disponible en `http://localhost:5173`.
+
+---
+
+## Usuarios de prueba
+
+| Usuario | Contraseña | Rol   |
+|---------|-----------|-------|
+| admin   | admin123  | ADMIN |
+| user    | user123   | USER  |
+
+---
+
+## Estructura del proyecto
+
+```
+src/
+├── components/    # GaleriaProductos, TarjetaProducto, Header, Footer,
+│                  # RutaPrivada, PanelServicios, PanelClientes, PanelProfesionales
+├── context/       # AuthContext, ProductosContext, CarritoContext, FavoritosContext
+├── data/          # menu, productos (imágenes y textos del catálogo)
+├── services/      # api.js (axios), AuthService, ServicioService, ClienteService,
+│                  # ProfesionalService, OrdenService
+└── views/         # Home, Productos, Producto, Carrito, Login, Registro,
+                   # Panel (admin), MiPerfil
+```
+
+---
+
+## Navegación
+
+| Ruta | Vista | Acceso |
+|------|-------|--------|
+| `/` | Home | Público |
+| `/productos` | Catálogo de planes | Público |
+| `/producto/:id` | Detalle de un plan | Público |
+| `/carrito` | Carrito de compra | Público (requiere sesión para finalizar) |
+| `/login` | Iniciar sesión | Público |
+| `/registro` | Crear cuenta | Público |
+| `/admin` | Panel de administración (CRUD) | Solo ADMIN |
+| `/perfil` | Mi perfil / mis órdenes | USER / ADMIN |
+
+---
+
+## Integración con el backend
+
+Todas las peticiones HTTP se hacen con **Axios** hacia `http://localhost:8080` (configurado en `src/services/api.js`).
+
+Las rutas protegidas envían el token JWT en el header `Authorization: Bearer <token>` (ver `src/services/authHeader.js`).
+
+La sesión persiste en `localStorage` (clave `nutrivida_sesion`) y se restaura al recargar la página.
+
+---
+
+## Funcionalidades
+
+- Catálogo de planes nutricionales consumido desde el backend
+- Carrito de compra que genera órdenes reales en la base de datos
+- Login con JWT y roles USER/ADMIN
+- Registro de nuevos usuarios (rol USER)
+- Panel de administración con CRUD completo de planes, clientes y profesionales
+- Vista "Mi Perfil" con el historial de órdenes del usuario
