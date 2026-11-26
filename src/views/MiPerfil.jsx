@@ -43,6 +43,8 @@ function MiPerfil() {
         <h2 style={{ textAlign: 'center' }}>Mi Perfil</h2>
         <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <div style={{ flex: 1, minWidth: '250px', maxWidth: '450px' }}>
+            {usuario?.username && <p><strong>Usuario:</strong> {usuario.username}</p>}
+            {usuario?.rol && <p><strong>Rol:</strong> {usuario.rol}</p>}
             <p><strong>Nombre:</strong> {usuario?.nombre} {usuario?.apellido}</p>
             <p><strong>RUT:</strong> {usuario?.rut}</p>
             <p><strong>Correo:</strong> {usuario?.email}</p>

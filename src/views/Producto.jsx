@@ -6,7 +6,7 @@ import { useFavoritos } from '../context/FavoritosContext';
 
 function Producto() {
   const { id } = useParams();
-  const { productos } = useProductos();
+  const { productos, cargando } = useProductos();
   const producto = productos.find((p) => p.id === Number(id));
   const { agregarAlCarrito } = useCarrito();
   const { esFavorito, toggleFavorito } = useFavoritos();
@@ -17,6 +17,14 @@ function Producto() {
     agregarAlCarrito(producto);
     setAgendado(true);
   };
+
+  if (cargando) {
+    return (
+      <main id="contenido">
+        <p>Cargando plan...</p>
+      </main>
+    );
+  }
 
   if (!producto) {
     return (

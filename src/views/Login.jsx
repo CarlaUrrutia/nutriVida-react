@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { useAuth } from '../context/AuthContext';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [nombreUsuario, setNombreUsuario] = useState('');
   const [pass, setPass] = useState('');
   const { iniciarSesion } = useAuth();
   const navigate = useNavigate();
@@ -13,8 +13,8 @@ function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (email.trim() === '') {
-      alert('El correo electrónico no puede estar vacío');
+    if (nombreUsuario.trim() === '') {
+      alert('El usuario no puede estar vacío');
       return;
     }
 
@@ -23,16 +23,16 @@ function Login() {
       return;
     }
 
-    const resultado = iniciarSesion(email, pass);
+    iniciarSesion(nombreUsuario, pass).then((resultado) => {
+      if (!resultado.exito) {
+        alert(resultado.mensaje);
+        setPass('');
+        return;
+      }
 
-    if (!resultado.exito) {
-      alert(resultado.mensaje);
-      setPass('');
-      return;
-    }
-
-    alert('Inicio de sesión exitoso!');
-    navigate(resultado.esAdmin ? '/admin' : '/perfil');
+      alert('Inicio de sesión exitoso!');
+      navigate(resultado.esAdmin ? '/admin' : '/perfil');
+    });
   };
 
   return (
@@ -42,16 +42,14 @@ function Login() {
           <fieldset>
             <legend>Iniciar Sesión</legend>
 
-            <Form.Group className="mb-3" controlId="email">
-              <Form.Label>
-                Correo electrónico: <span className="ayuda">(Solo @gmail.com, @outlook.com o @duocuc.cl)</span>
-              </Form.Label>
+            <Form.Group className="mb-3" controlId="usuario">
+              <Form.Label>Usuario: </Form.Label>
               <Form.Control
-                type="email"
+                type="text"
                 className="caja"
-                placeholder="ejemplo@correo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Ej: admin"
+                value={nombreUsuario}
+                onChange={(e) => setNombreUsuario(e.target.value)}
                 required
               />
             </Form.Group>
