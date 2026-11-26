@@ -1,27 +1,25 @@
-import axios from 'axios';
+import api from './api';
 import authHeader from './authHeader';
-
-const BASE_URL = 'http://localhost:8080/clientes';
 
 class ClienteService {
   getAllClientes() {
-    return axios.get(BASE_URL, authHeader());
+    return api.get('/clientes', authHeader());
   }
 
   getClienteById(id) {
-    return axios.get(`${BASE_URL}/${id}`, authHeader());
+    return api.get(`/clientes/${id}`, authHeader());
   }
 
   createCliente(cliente) {
-    return axios.post(BASE_URL, cliente, authHeader());
+    return api.post('/clientes', cliente, authHeader());
   }
 
   updateCliente(id, cliente) {
-    return axios.put(`${BASE_URL}/${id}`, cliente, authHeader());
+    return api.put(`/clientes/${id}`, cliente, authHeader());
   }
 
   deleteCliente(id) {
-    return axios.delete(`${BASE_URL}/${id}`, authHeader());
+    return api.delete(`/clientes/${id}`, authHeader());
   }
 }
 

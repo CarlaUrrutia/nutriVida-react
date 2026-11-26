@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Órdenes de compra de punta a punta + centralización Axios + frontend conectado al backend. Incluye: migración V5 con tablas orden y orden_detalle, entidades Orden/OrdenDetalle, OrdenRepository, DTOs OrdenRequest/OrdenItemRequest, OrdenService, OrdenController con POST /ordenes (autenticado USER|ADMIN) y GET /ordenes/mias, ajuste de SecurityConfig para /ordenes/**, instancia Axios centralizada api.js, OrdenService.js en frontend, actualización de todos los services a api.js, AuthContext.jsx async con registro hacia backend sin fallback local, Registro.jsx con handleSubmit async + mock en Registro.test.jsx, Carrito.jsx llamando a OrdenService.crearOrden, y sección 'Mis Órdenes' en MiPerfil.jsx.",
+  "status": "completed",
+  "steps": [
+    "Crear C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\resources\\db\\migration\\V5__ordenes.sql: tablas orden (id BIGINT AUTO_INCREMENT PK, username VARCHAR(50) NOT NULL, fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, total DOUBLE NOT NULL) y orden_detalle (id BIGINT AUTO_INCREMENT PK, id_orden BIGINT NOT NULL FK→orden(id), id_servicio BIGINT NOT NULL FK→servicio(id_servicio), cantidad INT NOT NULL, precio_unitario DOUBLE NOT NULL).",
+    "Crear model/Orden.java: @Entity @Table(name=\"orden\") con id, username, fecha (LocalDateTime), total (Double), detalles (@OneToMany mappedBy=\"orden\" cascade ALL orphanRemoval). Usar Lombok @Data @NoArgsConstructor @AllArgsConstructor igual que los modelos existentes.",
+    "Crear model/OrdenDetalle.java: @Entity @Table(name=\"orden_detalle\") con id, orden (@ManyToOne @JoinColumn(name=\"id_orden\") @JsonIgnore), idServicio (@Column name=\"id_servicio\"), cantidad (Integer), precioUnitario (@Column name=\"precio_unitario\", Double). Lombok igual.",
+    "Crear repository/OrdenRepository.java: JpaRepository<Orden, Long> con List<Orden> findByUsername(String username).",
+    "Crear dto/OrdenItemRequest.java y dto/OrdenRequest.java con Lombok @Data. OrdenItemRequest: idServicio (Long), cantidad (Integer), precioUnitario (Double). OrdenRequest: items (List<OrdenItemRequest>).",
+    "Crear service/OrdenService.java: crearOrden(username, OrdenRequest) que calcula total, construye la entidad Orden con sus OrdenDetalle y llama ordenRepository.save; findByUsername(username) delega al repositorio.",
+    "Crear controller/OrdenController.java: @RestController @RequestMapping(\"/ordenes\"). POST /ordenes: recibe OrdenRequest y Authentication (Spring Security), obtiene username con authentication.getName(), llama ordenService.crearOrden, devuelve 201 Created con la orden. GET /ordenes/mias: llama ordenService.findByUsername(authentication.getName()). Agregar @Tag para Swagger.",
+    "En SecurityConfig.java agregar .requestMatchers(\"/ordenes/**\").hasAnyRole(\"USER\", \"ADMIN\") antes de .anyRequest().hasRole(\"ADMIN\") en la cadena de authorizeHttpRequests.",
+    "Crear C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\services\\api.js: axios.create({ baseURL: 'http://localhost:8080' }); exportar como default.",
+    "Actualizar ClienteService.js, ProfesionalService.js, ServicioService.js: reemplazar 'import axios from axios' por 'import api from ./api', eliminar la constante BASE_URL, cambiar axios.xxx a api.xxx con rutas relativas ('/clientes', '/profesionales', '/servicios'). Mantener authHeader() donde ya se usaba.",
+    "Actualizar AuthService.js: usar api.js, login sigue igual pero usa api.post('/auth/login', ...), agregar método registro(data) que hace api.post('/auth/registro', data).then(r=>r.data).",
+    "Crear src/services/OrdenService.js: clase con crearOrden(items) → api.post('/ordenes', {items}, authHeader()).then(r=>r.data) y misOrdenes() → api.get('/ordenes/mias', authHeader()).then(r=>r.data). Exportar instancia.",
+    "Reescribir AuthContext.jsx: registrarUsuario pasa a async, llama AuthService.registro con {username: datos.email, email: datos.email, password: datos.password}, si OK llama AuthService.login para obtener token y guarda sesión en localStorage (preservar campos nombre/apellido/rut/fechaNacimiento/objetivo en la sesión), retorna {exito:true}; en catch 409 retorna {exito:false, mensaje:'Ese correo ya está registrado, inicia sesión.'}. iniciarSesion: eliminar el bloque catch que busca en localStorage['nutrivida_usuarios']; si el backend falla sin respuesta devolver 'No se pudo conectar con el servidor...', si falla con respuesta devolver 'Usuario o contraseña incorrectos'.",
+    "Actualizar src/views/Registro.jsx: cambiar handleSubmit a async function, usar 'const resultado = await registrarUsuario(...)'. Mantener exactamente alert('Registro exitoso!') para no romper el test.",
+    "Actualizar src/views/Registro.test.jsx: agregar 'import { vi } from vitest'; agregar 'import AuthService from ../services/AuthService'; agregar vi.spyOn(AuthService, 'registro').mockResolvedValue({}) y vi.spyOn(AuthService, 'login').mockResolvedValue({username:'juan@gmail.com', rol:'USER', token:'fake'}) en un beforeAll o antes de los tests. Cambiar el último test 'Debe registrar correctamente' a async con await waitFor(() => expect(ultimoMensaje).toBe('Registro exitoso!')). Agregar import waitFor de @testing-library/react.",
+    "Actualizar src/views/Carrito.jsx: agregar 'import OrdenService from ../services/OrdenService'. Cambiar handleFinalizar a async: mapear carrito a items con {idServicio: item.id, cantidad: item.cantidad, precioUnitario: item.precio}, llamar await OrdenService.crearOrden(items) en try/catch; en éxito alert('¡Compra realizada con éxito!') y vaciarCarrito(); en error alert('No se pudo procesar la compra. Intenta de nuevo.').",
+    "Actualizar src/views/MiPerfil.jsx: agregar imports useState, useEffect y OrdenService. En la rama de usuario no-admin, agregar estado ordenes con useState([]) y useEffect que llama OrdenService.misOrdenes().then(setOrdenes).catch(()=>setOrdenes([])). Agregar sección JSX '📋 Mis Órdenes' con lista de órdenes (id, fecha con toLocaleDateString('es-CL'), total con toLocaleString('es-CL'))."
+  ],
+  "acceptance_criteria": [
+    "mvnw compile termina con BUILD SUCCESS (backend).",
+    "npm run build termina sin errores (frontend).",
+    "npm test -- --run pasa todos los tests incluyendo Registro.test.jsx.",
+    "OrdenController.java existe con POST /ordenes y GET /ordenes/mias.",
+    "api.js existe en src/services/ y los cuatro services lo importan (sin BASE_URL local).",
+    "AuthContext.jsx no contiene localStorage['nutrivida_usuarios'] ni el fallback de login local.",
+    "Carrito.jsx llama a OrdenService.crearOrden en handleFinalizar.",
+    "MiPerfil.jsx tiene sección Mis Órdenes con llamada a OrdenService.misOrdenes."
+  ],
+  "verification": [
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd compile — BUILD SUCCESS",
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react && npm run build — sin errores",
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react && npm test -- --run — todos los tests pasan"
+  ],
+  "blocked_reason": null,
+  "findings": "All steps implemented and verified. Backend: BUILD SUCCESS (34 source files compiled). Frontend: vite build clean (193 modules). Tests: 11/11 pass including async Registro.test.jsx. No behavioral regressions detected."
+}

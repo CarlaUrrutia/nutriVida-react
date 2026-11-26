@@ -1,18 +1,29 @@
 import { Link } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
+import OrdenService from '../services/OrdenService';
 
 function Carrito() {
   const { carrito, quitarDelCarrito, vaciarCarrito } = useCarrito();
 
   const total = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
 
-  const handleFinalizar = () => {
+  const handleFinalizar = async () => {
     if (carrito.length === 0) {
       alert('Tu carrito está vacío');
       return;
     }
-    alert('¡Compra realizada con éxito!');
-    vaciarCarrito();
+    try {
+      const items = carrito.map((item) => ({
+        idServicio: item.id,
+        cantidad: item.cantidad,
+        precioUnitario: item.precio
+      }));
+      await OrdenService.crearOrden(items);
+      alert('¡Compra realizada con éxito!');
+      vaciarCarrito();
+    } catch {
+      alert('No se pudo procesar la compra. Intenta de nuevo.');
+    }
   };
 
   if (carrito.length === 0) {

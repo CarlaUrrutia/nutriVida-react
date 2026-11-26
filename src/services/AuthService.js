@@ -1,10 +1,12 @@
-import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8080/auth';
+import api from './api';
 
 class AuthService {
   login(username, password) {
-    return axios.post(`${BASE_URL}/login`, { username, password }).then((response) => response.data);
+    return api.post('/auth/login', { username, password }).then((r) => r.data);
+  }
+
+  registro(data) {
+    return api.post('/auth/registro', data).then((r) => r.data);
   }
 }
 

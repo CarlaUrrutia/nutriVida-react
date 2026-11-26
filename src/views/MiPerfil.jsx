@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFavoritos } from '../context/FavoritosContext';
 import { useProductos } from '../context/ProductosContext';
+import OrdenService from '../services/OrdenService';
 
 const objetivosLabels = {
   peso: 'Pérdida de peso',
@@ -15,7 +17,14 @@ function MiPerfil() {
   const { favoritos } = useFavoritos();
   const { productos } = useProductos();
   const navigate = useNavigate();
+  const [ordenes, setOrdenes] = useState([]);
   const productosFavoritos = productos.filter((p) => favoritos.includes(p.id));
+
+  useEffect(() => {
+    if (usuario && !usuario.esAdmin) {
+      OrdenService.misOrdenes().then(setOrdenes).catch(() => setOrdenes([]));
+    }
+  }, [usuario]);
 
   const handleCerrarSesion = () => {
     cerrarSesion();
@@ -66,6 +75,18 @@ function MiPerfil() {
               ))}
             </ul>
           </div>
+        </div>
+
+        <div style={{ marginTop: '30px' }}>
+          <h3>📋 Mis Órdenes</h3>
+          {ordenes.length === 0 && <p>Aún no tienes órdenes registradas.</p>}
+          <ul>
+            {ordenes.map((orden) => (
+              <li key={orden.id}>
+                <strong>Orden #{orden.id}</strong> — {new Date(orden.fecha).toLocaleDateString('es-CL')} — ${orden.total.toLocaleString('es-CL')}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </main>

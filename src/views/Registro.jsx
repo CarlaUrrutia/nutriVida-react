@@ -16,7 +16,7 @@ function Registro() {
   const { registrarUsuario } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (nombre.trim() === '') {
@@ -84,7 +84,7 @@ function Registro() {
       return;
     }
 
-    const resultado = registrarUsuario({
+    const resultado = await registrarUsuario({
       nombre,
       apellido,
       rut,

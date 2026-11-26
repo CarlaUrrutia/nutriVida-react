@@ -1,0 +1,33 @@
+{
+  "project_type": "Vite/React 19 frontend + Spring Boot 4.1.2 (Java 21) backend + MySQL via Flyway",
+  "language": "Java (backend), JavaScript/JSX (frontend)",
+  "build_system": "Maven Wrapper (backend: mvnw.cmd), Vite + npm (frontend). Backend pom parent spring-boot-starter-parent 4.1.2. No Spring Boot Validation starter — @Valid is not in pom (do not add @Valid annotations). Lombok is present.",
+  "test_framework": "Backend: JUnit 5 + Mockito (via spring-boot-starter-test) + net.datafaker 2.4.3. Frontend: Vitest 5 + @testing-library/react 16 + jsdom 30. Frontend config file: setupTests.js (empty essentially).",
+  "build_command": "Backend: cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd compile | Frontend: cd C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react && npm run build",
+  "test_command": "Backend: cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd test -Dtest=ClienteServiceTest,ProfesionalServiceTest,ServicioServiceTest | Frontend: cd C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react && npm test -- --run",
+  "verification_instructions": "1. Run backend compile: cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd compile — must exit 0 with BUILD SUCCESS. 2. Run backend unit tests: .\\mvnw.cmd test -Dtest=ClienteServiceTest,ProfesionalServiceTest,ServicioServiceTest — all pass. 3. Run frontend build: cd C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react && npm run build — must complete without errors. 4. Run frontend tests: npm test -- --run — all pass including Registro.test.jsx.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "NO git commit/push — user commits with GitHub Desktop. Backend dir: C:\\Users\\urrut\\OneDrive\\Desktop\\bd. Frontend dir: C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react. Backend compiles clean at baseline (verified). springdoc 2.8.8 is incompatible with Spring Boot 4.1.2 — must be upgraded to 3.2.0 (springdoc major tracks Spring Boot major: 3.x for Boot 4.x). No Spring Boot Validation dependency in pom — do NOT use @Valid. BCrypt hashes in V4 migration must be generated fresh with BCryptPasswordEncoder (each encode() call produces a different valid hash).",
+  "contribution_requirements": "No AGENTS.md or CONTRIBUTING.md found in either repo. No restrictions beyond those stated in the task.",
+  "key_patterns": "Backend models use Lombok @Data @NoArgsConstructor @AllArgsConstructor + JPA @Entity. Services inject repositories via @Autowired. Controllers use @RestController @RequestMapping. DTOs use Lombok @Data. Repositories extend JpaRepository. SecurityConfig uses BCryptPasswordEncoder bean named passwordEncoder. SwaggerConfig already adds global bearerAuth SecurityRequirement — no per-controller @SecurityRequirement needed. Frontend services are classes with methods returning axios promises, instantiated and exported as singletons. AuthContext stores session in localStorage key 'nutrivida_sesion'. authHeader() reads that key and returns {headers: {Authorization: 'Bearer ...'}}. Registro.test.jsx uses window.alert mock and expects 'Registro exitoso!' — must be preserved.",
+  "relevant_files": [
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\pom.xml",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\security\\UserDetailsServiceImpl.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\security\\SecurityConfig.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\controller\\AuthController.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\service\\ClienteService.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\service\\ProfesionalService.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\service\\ServicioService.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\model\\Cliente.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\config\\SwaggerConfig.java",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\resources\\db\\migration\\V1__init_schema.sql",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\context\\AuthContext.jsx",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\services\\AuthService.js",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\services\\ClienteService.js",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\views\\Registro.jsx",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\views\\Registro.test.jsx",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\views\\Carrito.jsx",
+    "C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\views\\MiPerfil.jsx"
+  ],
+  "directory_structure": "Backend (C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\): model/ (Cliente, Profesional, Servicio), repository/ (3 repos), service/ (3 services), controller/ (AuthController, 3 CRUD controllers), security/ (JwtUtil, JwtAuthenticationFilter, UserDetailsServiceImpl, SecurityConfig), config/ (SwaggerConfig, CorsConfig), dto/ (AuthRequest, AuthResponse). Migrations: src/main/resources/db/migration/V1__init_schema.sql (tables), V2__insert_sample_data.sql (seed), V3__planes_nutrivida.sql (servicios). Frontend (C:\\Users\\urrut\\OneDrive\\Desktop\\nutriVida-react\\src\\): components/ (Header, Footer, Panel*, RutaPrivada, Seccion, TarjetaProducto, GaleriaProductos), context/ (AuthContext, CarritoContext, FavoritosContext, ProductosContext), services/ (authHeader, AuthService, ClienteService, ProfesionalService, ServicioService), views/ (Home, Login, Registro, Registro.test, Carrito, MiPerfil, Panel, Producto, Productos, NotFound), data/ (menu.js, productos.js), main.jsx, App.jsx."
+}

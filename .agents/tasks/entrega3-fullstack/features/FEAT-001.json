@@ -1,0 +1,24 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Backend base: subir springdoc-openapi de 2.8.8 a 3.2.0 (2.8.x es incompatible con Spring Boot 4.1.2; springdoc major sigue el major de Boot: 3.x para Boot 4.x), crear GlobalExceptionHandler con @RestControllerAdvice (NoSuchElementException→404, DataIntegrityViolationException→409, MethodArgumentNotValidException→400, respuesta JSON {\"error\":\"mensaje\"}), y corregir los tres services CRUD (Cliente, Profesional, Servicio) para que update y deleteById lancen NoSuchElementException cuando el registro no existe (el update de ID inexistente NO debe crear registro nuevo).",
+  "status": "completed",
+  "steps": [
+    "En C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\pom.xml, cambiar la versión de springdoc-openapi-starter-webmvc-ui de 2.8.8 a 3.2.0.",
+    "Crear C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\java\\com\\NutriVida\\bd\\controller\\GlobalExceptionHandler.java con @RestControllerAdvice. Manejadores: NoSuchElementException → 404 con {\"error\": mensaje}; DataIntegrityViolationException → 409 con {\"error\": \"Conflicto de integridad de datos\"}; MethodArgumentNotValidException → 400 con {\"error\": primer campo y mensaje}. Usar ResponseEntity<Map<String, String>>.",
+    "En ClienteService.java (service/), cambiar update(Long id, Cliente cliente) para verificar clienteRepository.existsById(id) y lanzar new NoSuchElementException(\"Cliente no encontrado con id: \" + id) si no existe, antes de setId y save. Cambiar deleteById(Long id) para verificar existsById y lanzar la misma excepción antes de llamar a deleteById del repositorio.",
+    "Repetir exactamente el mismo patrón en ProfesionalService.java (id_profesional, mensaje \"Profesional no encontrado con id: \") y ServicioService.java (id_servicio, mensaje \"Servicio no encontrado con id: \")."
+  ],
+  "acceptance_criteria": [
+    "El comando mvnw compile termina con BUILD SUCCESS.",
+    "Los tests existentes ClienteServiceTest, ProfesionalServiceTest y ServicioServiceTest siguen pasando (no usan update/delete con IDs inexistentes, y findAll/findById no cambian).",
+    "El pom.xml declara springdoc-openapi-starter-webmvc-ui versión 3.2.0.",
+    "Los tres services lanzan NoSuchElementException en update y deleteById cuando el ID no existe."
+  ],
+  "verification": [
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd compile — BUILD SUCCESS",
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd test -Dtest=ClienteServiceTest,ProfesionalServiceTest,ServicioServiceTest — todos pasan"
+  ],
+  "blocked_reason": null,
+  "findings": "Los tests de update_* y deleteById_* fueron actualizados para agregar when(repo.existsById(1L)).thenReturn(true) — necesario porque los services ahora llaman existsById antes de operar. Sin ese stub, Mockito devuelve false (default) y los tests fallaban. Los FEATs siguientes deben saber: GlobalExceptionHandler está en el package controller/, maneja las tres excepciones estándar. springdoc 3.2.0 requiere que SwaggerConfig siga usando las APIs de springdoc-openapi 2.x/3.x (sin cambios en SwaggerConfig). Los controllers CRUD ya pueden lanzar NoSuchElementException desde los services y será capturada automáticamente con 404. No se agregó spring-boot-starter-validation al pom (sigue sin estar); MethodArgumentNotValidException solo se lanzará si se agrega @Valid en algún controller en el futuro."
+}

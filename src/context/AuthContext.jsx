@@ -13,26 +13,36 @@ export function AuthProvider({ children }) {
     return sesion;
   });
 
-  const obtenerUsuarios = () => {
-    const guardado = localStorage.getItem('nutrivida_usuarios');
-    return guardado ? JSON.parse(guardado) : [];
-  };
+  const registrarUsuario = async (datos) => {
+    try {
+      await AuthService.registro({
+        username: datos.email,
+        email: datos.email,
+        password: datos.password
+      });
 
-  const registrarUsuario = (datos) => {
-    const usuarios = obtenerUsuarios();
-    const yaExiste = usuarios.some((u) => u.email === datos.email);
-    if (yaExiste) {
-      return { exito: false, mensaje: 'Ese correo ya está registrado, inicia sesión.' };
+      const loginDatos = await AuthService.login(datos.email, datos.password);
+      const sesion = {
+        username: loginDatos.username,
+        email: loginDatos.username,
+        nombre: datos.nombre,
+        apellido: datos.apellido,
+        rut: datos.rut,
+        fechaNacimiento: datos.fechaNacimiento,
+        objetivo: datos.objetivo,
+        rol: loginDatos.rol,
+        esAdmin: loginDatos.rol === 'ADMIN',
+        token: loginDatos.token
+      };
+      localStorage.setItem('nutrivida_sesion', JSON.stringify(sesion));
+      setUsuario(sesion);
+      return { exito: true };
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        return { exito: false, mensaje: 'Ese correo ya está registrado, inicia sesión.' };
+      }
+      return { exito: false, mensaje: error.response ? 'Error al registrar usuario.' : 'No se pudo conectar con el servidor.' };
     }
-
-    const usuariosActualizados = [...usuarios, datos];
-    localStorage.setItem('nutrivida_usuarios', JSON.stringify(usuariosActualizados));
-
-    const { password: _password, ...datosSinPassword } = datos;
-    const sesion = { ...datosSinPassword, esAdmin: false };
-    localStorage.setItem('nutrivida_sesion', JSON.stringify(sesion));
-    setUsuario(sesion);
-    return { exito: true };
   };
 
   const iniciarSesion = (username, password) => {
@@ -48,15 +58,6 @@ export function AuthProvider({ children }) {
       setUsuario(sesion);
       return { exito: true, esAdmin: sesion.esAdmin };
     }).catch((error) => {
-      const usuarios = obtenerUsuarios();
-      const encontrado = usuarios.find((u) => u.email === username && u.password === password);
-      if (encontrado) {
-        const { password: _password, ...datosSinPassword } = encontrado;
-        const sesion = { ...datosSinPassword, esAdmin: false };
-        localStorage.setItem('nutrivida_sesion', JSON.stringify(sesion));
-        setUsuario(sesion);
-        return { exito: true, esAdmin: false };
-      }
       if (!error.response) {
         return { exito: false, mensaje: 'No se pudo conectar con el servidor. ¿Está encendido el backend?' };
       }

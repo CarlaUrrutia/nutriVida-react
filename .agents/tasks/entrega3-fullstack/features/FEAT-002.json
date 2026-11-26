@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Persistir usuarios en MySQL: migración V4 con tabla usuario y seed de admin/user, entidad Usuario, UsuarioRepository, UsuarioService con registro (BCrypt + unicidad), reescritura de UserDetailsServiceImpl para leer de la BD, y endpoint POST /auth/registro en AuthController. El bean PasswordEncoder (BCryptPasswordEncoder) ya existe en SecurityConfig — usarlo, no crear otro. Login admin/admin123 y user/user123 debe seguir funcionando tras la migración.",
+  "status": "completed",
+  "steps": [
+    "Generar los dos hashes BCrypt: escribir y correr un main temporal (o usar el test de la app) con new BCryptPasswordEncoder().encode(\"admin123\") y .encode(\"user123\"). Costo por defecto (10).",
+    "Crear C:\\Users\\urrut\\OneDrive\\Desktop\\bd\\src\\main\\resources\\db\\migration\\V4__usuarios.sql: tabla usuario (id BIGINT AUTO_INCREMENT PK, username VARCHAR(50) NOT NULL, email VARCHAR(150) NOT NULL, password_hash VARCHAR(255) NOT NULL, rol VARCHAR(20) NOT NULL DEFAULT 'USER', UNIQUE(username), UNIQUE(email)). INSERT de admin (rol ADMIN, email admin@nutrivida.cl, hash de admin123) y user (rol USER, email user@nutrivida.cl, hash de user123) usando los hashes generados. Borrar el main temporal si se creó.",
+    "Crear src/main/java/com/NutriVida/bd/model/Usuario.java: entidad JPA @Table(name=\"usuario\") con @UniqueConstraint en username y email, campos id, username, email, passwordHash (@Column name=\"password_hash\"), rol. Seguir el patrón Lombok (@Data, @NoArgsConstructor, @AllArgsConstructor) de model/Cliente.java.",
+    "Crear src/main/java/com/NutriVida/bd/repository/UsuarioRepository.java: interface JpaRepository<Usuario, Long> con Optional<Usuario> findByUsername(String), boolean existsByUsername(String), boolean existsByEmail(String).",
+    "Crear src/main/java/com/NutriVida/bd/service/UsuarioService.java: registrar(username, email, password) que valida existsByUsername/existsByEmail (lanza IllegalArgumentException con mensaje en español: 'El nombre de usuario ya está en uso' / 'El correo ya está registrado'), hashea con el bean PasswordEncoder inyectado y guarda con rol 'USER'; y findByUsername(username).",
+    "Reescribir src/main/java/com/NutriVida/bd/security/UserDetailsServiceImpl.java: inyectar UsuarioRepository, en loadUserByUsername hacer findByUsername y construir User.withUsername(...).password(usuario.getPasswordHash()).roles(usuario.getRol()).build(); lanzar UsernameNotFoundException si no existe. Eliminar los usuarios hardcodeados y el BCryptPasswordEncoder estático.",
+    "Crear src/main/java/com/NutriVida/bd/dto/RegistroRequest.java: Lombok @Data con username, email, password.",
+    "En AuthController.java agregar POST /auth/registro: recibe RegistroRequest, llama usuarioService.registrar, devuelve 201 con {\"mensaje\": \"Usuario registrado exitosamente\"}; captura IllegalArgumentException y devuelve 409 con {\"error\": mensaje}. Agregar imports de UsuarioService, RegistroRequest, HttpStatus, ResponseEntity, Map."
+  ],
+  "acceptance_criteria": [
+    "mvnw compile termina con BUILD SUCCESS.",
+    "La migración V4__usuarios.sql existe, crea la tabla usuario con UNIQUE en username y email, y siembra admin (ADMIN) y user (USER).",
+    "UserDetailsServiceImpl ya no contiene usuarios hardcodeados: lee de UsuarioRepository.",
+    "POST /auth/registro existe en AuthController y devuelve 201; el registro duplicado devuelve 409."
+  ],
+  "verification": [
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd compile — BUILD SUCCESS",
+    "cd C:\\Users\\urrut\\OneDrive\\Desktop\\bd && .\\mvnw.cmd test -Dtest=ClienteServiceTest,ProfesionalServiceTest,ServicioServiceTest — siguen pasando"
+  ],
+  "blocked_reason": null,
+  "findings": "Implementado sin hallazgos. Hashes BCrypt generados con BCryptPasswordEncoder default (cost 10). V4__usuarios.sql crea tabla usuario con UNIQUE en username y email, e inserta admin (ADMIN) y user (USER). UserDetailsServiceImpl reescrito para leer de UsuarioRepository. POST /auth/registro agregado en AuthController (201 en éxito, 409 en duplicado). mvnw compile: BUILD SUCCESS. 18 tests existentes: BUILD SUCCESS, 0 failures."
+}

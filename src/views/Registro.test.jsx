@@ -1,8 +1,15 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import Registro from './Registro';
+import AuthService from '../services/AuthService';
+
+// Mocks de AuthService para que los tests no dependan del backend
+beforeAll(() => {
+  vi.spyOn(AuthService, 'registro').mockResolvedValue({});
+  vi.spyOn(AuthService, 'login').mockResolvedValue({ username: 'juan@gmail.com', rol: 'USER', token: 'fake' });
+});
 
 // Registro usa useNavigate y useAuth, así que necesita router y el auth
 function dibujarRegistro() {
@@ -116,7 +123,7 @@ describe('Registro', () => {
     expect(ultimoMensaje).toBe('Las contraseñas no coinciden');
   });
 
-  it('Debe registrar correctamente cuando todos los datos son válidos', () => {
+  it('Debe registrar correctamente cuando todos los datos son válidos', async () => {
     dibujarRegistro();
 
     fireEvent.change(screen.getByLabelText(/^Nombre:/i), { target: { value: 'Juan' } });
@@ -129,7 +136,7 @@ describe('Registro', () => {
     fireEvent.change(screen.getByLabelText(/Objetivo Nutricional:/i), { target: { value: 'peso' } });
     fireEvent.click(screen.getByRole('button', { name: /Registrarse/i }));
 
-    expect(ultimoMensaje).toBe('Registro exitoso!');
+    await waitFor(() => expect(ultimoMensaje).toBe('Registro exitoso!'));
   });
 
 });

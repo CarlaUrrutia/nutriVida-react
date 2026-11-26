@@ -1,27 +1,25 @@
-import axios from 'axios';
+import api from './api';
 import authHeader from './authHeader';
-
-const BASE_URL = 'http://localhost:8080/profesionales';
 
 class ProfesionalService {
   getAllProfesionales() {
-    return axios.get(BASE_URL, authHeader());
+    return api.get('/profesionales', authHeader());
   }
 
   getProfesionalById(id) {
-    return axios.get(`${BASE_URL}/${id}`, authHeader());
+    return api.get(`/profesionales/${id}`, authHeader());
   }
 
   createProfesional(profesional) {
-    return axios.post(BASE_URL, profesional, authHeader());
+    return api.post('/profesionales', profesional, authHeader());
   }
 
   updateProfesional(id, profesional) {
-    return axios.put(`${BASE_URL}/${id}`, profesional, authHeader());
+    return api.put(`/profesionales/${id}`, profesional, authHeader());
   }
 
   deleteProfesional(id) {
-    return axios.delete(`${BASE_URL}/${id}`, authHeader());
+    return api.delete(`/profesionales/${id}`, authHeader());
   }
 }
 

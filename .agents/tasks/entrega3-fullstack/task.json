@@ -1,0 +1,7 @@
+{
+  "task_id": "task-entrega3-fullstack",
+  "task_description": "Cerrar los gaps de código para la entrega final Full Stack de NutriVida: persistencia de usuarios en MySQL, registro vía backend, manejo de errores HTTP, órdenes de compra, rol USER visible en UI, Swagger con springdoc 3.x compatible con Spring Boot 4.1.2, y centralización de Axios.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}
